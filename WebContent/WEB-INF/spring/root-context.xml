@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components 
+		application level configuration -->
+	<!-- DataSource configuration for Database Connection -->
+	<!-- Configuring DataSource with the help of class DriverManagerDataSource -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:XE" />
+		<property name="username" value="hr" />
+		<property name="password" value="hr" />
+	</bean>
+	<!-- Hibernate Integartion with Spring with the help of spring framework 
+		hibernate class LocalSessionFactoryBean -->
+	<!-- Hibernate 4 SessionFactory Bean definition -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<!-- Map all the annotated class with @Entity -->
+			<list>
+				<value>com.lnt.mvc.model.Person</value>
+				 <value>com.lnt.mvc.model.Announcement</value> 
+				<value>com.lnt.mvc.model.Employee</value>
+				<value>com.lnt.mvc.model.EmployeeDetails</value>
+				<value>com.lnt.mvc.model.Department</value>
+				<value>com.lnt.mvc.model.Job</value>
+				<value>com.lnt.mvc.model.Feedback</value>
+				<value>com.lnt.mvc.model.Complaint</value>
+				<value>com.lnt.mvc.model.EmployeeAnnualLeave</value>
+				<value>com.lnt.mvc.model.LeaveMaster</value>
+				<value>com.lnt.mvc.model.Location</value>
+				<value>com.lnt.mvc.model.TimeSheet</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect
+				</prop>
+
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- @Repository -->
+	<bean id="personDao" class="com.lnt.mvc.dao.PersonDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- @Repository -->
+	<bean id="empDao" class="com.lnt.mvc.dao.EmployeeDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- @Repository -->
+	<bean id="jobDao" class="com.lnt.mvc.dao.JobDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- @Repository -->
+	<bean id="deptDao" class="com.lnt.mvc.dao.DepartmentDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- @Repository -->
+	<bean id="ealDao" class="com.lnt.mvc.dao.EmployeeAnnualLeaveDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="lvDao" class="com.lnt.mvc.dao.LeaveMasterDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="fbDao" class="com.lnt.mvc.dao.FeedbackDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- @Service -->
+	<bean id="personService" class="com.lnt.mvc.service.PersonServiceImpl">
+		<property name="personDao" ref="personDao"></property>
+	</bean>
+	
+	<bean id="aDao" class="com.lnt.mvc.dao.AnnouncementDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	
+	
+	<!-- 
+	<bean id="lmService" class="com.lnt.mvc.service.LeaveMasterServiceImpl">
+		<property name="lvDao" ref="lvDao"></property>
+	</bean>
+	@Service
+	<bean id="ealService" class="com.lnt.mvc.service.EmployeeAnnualLeaveServiceImpl">
+		<property name="ealDao" ref="ealDao"></property>
+	</bean> -->
+
+	<!-- Enables springframework Hibernate Transactions -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- This bean will handle all transaction within an application -->
+
+	<!-- This is required to handle transactions via Annotations like @Transactional -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+</beans>
